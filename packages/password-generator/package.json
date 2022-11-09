@@ -1,0 +1,30 @@
+{
+  "name": "password-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "install": "tsc",
+    "test": "ava"
+  },
+  "keywords": [],
+  "author": "Andy <hello@itsandy.me>",
+  "license": "MIT",
+  "ava": {
+    "typescript": {
+      "rewritePaths": {
+        "src/": "dist/"
+      },
+      "compile": false
+    }
+  },
+  "devDependencies": {
+    "@ava/typescript": "^3.0.1",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "ava": "^5.0.1",
+    "eslint": "^8.27.0",
+    "typescript": "^4.8.4"
+  }
+}

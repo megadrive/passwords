@@ -28,7 +28,7 @@ function collateWords() {
   };
 
   const animals = parse(rawAnimals);
-  const adjectives = parse(rawAnimals);
+  const adjectives = parse(rawAdjectives);
 
   return { animals, adjectives };
 }
@@ -52,7 +52,11 @@ export function GeneratePassword(
   let noun = randomInArray(words.animals);
 
   if (resolvedOpts.alliteration) {
-    while (adjective[0].toLowerCase() !== noun[0].toLowerCase()) {
+    while (
+      adjective &&
+      noun &&
+      adjective[0].toLowerCase() !== noun[0].toLowerCase()
+    ) {
       noun = randomInArray(words.animals);
     }
   }
@@ -66,8 +70,7 @@ export function GeneratePassword(
 
   const generated = interim.join("");
 
-  if (!verify(generated, resolvedOpts)) {
-    console.log(`${generated} not good, regenerating`);
+  if (!verify(generated, resolvedOpts).result) {
     return GeneratePassword(resolvedOpts);
   }
 
@@ -79,28 +82,30 @@ export function count(str: string, dict: string[] | number[]) {
   return [...str.matchAll(constructedRegex)].map((e) => e[0]).length;
 }
 
-export function verify(password: string, options: PasswordGeneratorOptions) {
+export function verify(
+  password: string,
+  options: PasswordGeneratorOptions
+): { errors?: string[]; result: boolean } {
+  const errors: string[] = [];
+
   if (password.length < options.minLength) {
-    console.log("length");
-    return false;
+    errors.push(`Not long enough: min ${options.minLength}`);
   }
 
   if (count(password, Array.from(options.dicts.alpha)) < options.minAlpha) {
-    console.log("alpha");
-    return false;
+    errors.push(`Not enough alpha: min ${options.minAlpha}`);
   }
 
   if (count(password, Array.from(options.dicts.numeric)) < options.minNumeric) {
-    console.log("numeric");
-    return false;
+    errors.push(`Not enough numeric: min ${options.minNumeric}`);
   }
 
   if (count(password, Array.from(options.dicts.symbol)) < options.minSymbols) {
-    console.log("symbols");
-    return false;
+    errors.push(`Not enough symbols: min ${options.minSymbols}`);
   }
 
-  return true;
+  return {
+    result: errors.length === 0,
+    errors: errors.length ? errors : undefined,
+  };
 }
-
-GeneratePassword();
