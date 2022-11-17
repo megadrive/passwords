@@ -6,6 +6,8 @@ export const defaultPasswordGeneratorOptions = {
   minAlpha: 1,
   minNumeric: 1,
   minSymbols: 1,
+  /** Use the same symbol rather than generating multiple */
+  sameSymbol: false,
   /** Alliterate the password. Example: AggrivatedAlligator */
   alliteration: true,
   dicts: {
@@ -40,6 +42,10 @@ function randomInArray(arr: unknown[]) {
   return arr[Math.floor(arr.length * Math.random())];
 }
 
+function capitalise(s: string) {
+  return s.substring(0, 1).toUpperCase() + s.substring(1);
+}
+
 export function GeneratePassword(
   options: Partial<PasswordGeneratorOptions> = {}
 ): string {
@@ -48,7 +54,7 @@ export function GeneratePassword(
 
   const words = collateWords();
 
-  const adjective = randomInArray(words.adjectives);
+  const adjective = capitalise(randomInArray(words.adjectives));
   let noun = randomInArray(words.animals);
 
   if (resolvedOpts.alliteration) {
@@ -61,12 +67,18 @@ export function GeneratePassword(
     }
   }
 
+  const symbol = randomInArray(Array.from(resolvedOpts.dicts.symbol));
+
   interim.push(...[adjective, noun]);
-  interim.push(randomInArray(Array.from(resolvedOpts.dicts.symbol)));
+  interim.push(symbol);
   interim.push(randomInArray(Array.from(resolvedOpts.dicts.numeric)));
   interim.push(randomInArray(Array.from(resolvedOpts.dicts.numeric)));
   interim.push(randomInArray(Array.from(resolvedOpts.dicts.numeric)));
-  interim.push(randomInArray(Array.from(resolvedOpts.dicts.symbol)));
+  if (resolvedOpts.sameSymbol) {
+    interim.push(symbol);
+  } else {
+    interim.push(randomInArray(Array.from(resolvedOpts.dicts.symbol)));
+  }
 
   const generated = interim.join("");
 
